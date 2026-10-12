@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>داوری قطعه‌ها</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+body{margin:0;background:#f3f5f7;color:#16202a;font-family:Vazirmatn,Tahoma,sans-serif;font-size:17px;line-height:2}
+.wrap{max-width:900px;margin:auto;padding:24px 16px}.card{background:#fff;border:1px solid #d8dfe6;border-radius:16px;padding:22px;margin-bottom:16px}
+h1{font-size:23px;margin:0 0 8px}video{width:100%;border-radius:10px;background:#000}
+.item{margin:14px 0}.scale{display:flex;gap:6px;flex-wrap:wrap}.scale button{border:1px solid #d8dfe6;background:#f3f5f7;border-radius:9px;padding:6px 13px;font:inherit;cursor:pointer}
+.scale button.on{background:#0f766e;color:#fff;border-color:#0f766e}.ends{display:flex;justify-content:space-between;color:#55616e;font-size:14px}
+button.main{border:0;background:#0f766e;color:#fff;border-radius:11px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}button:disabled{opacity:.4}
+input,textarea{width:100%;padding:9px;border:1px solid #d8dfe6;border-radius:10px;font:inherit}.hidden{display:none}.muted{color:#55616e;font-size:15px}
+</style>
+</head>
+<body><div class="wrap">
+<div class="card" id="intro">
+<h1>داوری قطعه‌های موزیک‌ویدئو</h1>
+<p>این فرم برای داورانی است که با موزیک‌ویدئوهای کی‌پاپ آشنا هستند. چند قطعه‌ی ۲۰ ثانیه‌ای را با ترتیب تصادفی می‌بینید و هر کدام را با چهار پرسش ارزیابی می‌کنید. می‌توانید هر قطعه را چند بار ببینید. حدود ۲۵ دقیقه طول می‌کشد.</p>
+<p class="muted">منظور از «قالب» یا «فرمول»: الگوهای تکرارشونده‌ای که در بسیاری از موزیک‌ویدئوهای کی‌پاپ دیده می‌شود (رقص گروهی هم‌زمان رو به دوربین، حرکت امضا، چیدمان اعضا، نماهای نزدیک چهره در خط‌های تکی، تدوین هم‌گام با ضرب و…). منظور از «سطح»: مفهوم، رنگ، لباس، صحنه و نشانه‌های ظاهری.</p>
+<label>نام یا کد شما</label><input id="rater">
+<label>آشنایی شما با موزیک‌ویدئوهای کی‌پاپ</label>
+<div class="scale" id="fam"><button data-v="1">کم</button><button data-v="2">متوسط</button><button data-v="3">زیاد</button><button data-v="4">حرفه‌ای (پژوهشگر/منتقد/طراح)</button></div>
+<p style="margin-top:16px"><button class="main" id="go" disabled>شروع</button></p>
+</div>
+<div class="card hidden" id="clipCard">
+<div id="hdr" class="muted"></div>
+<video id="v" controls playsinline></video>
+<div id="items"></div>
+<label>یادداشت (اختیاری): چه چیزی در این قطعه قالبی یا متمایز است؟</label><textarea id="note" rows="2"></textarea>
+<p><button class="main" id="next" disabled>قطعه‌ی بعد</button></p>
+</div>
+<div class="card hidden" id="done"><h1>سپاس 🌷</h1><p id="doneTxt"></p></div>
+</div>
+<script>
+const API = 'https://REPLACE-WITH-SAVE-WORKER.workers.dev';
+const CLIPS = Array.from({length: 15}, (_, i) => 'R' + String(i + 1).padStart(2, '0'));   // rate/R01.mp4 ... (all verified shortlist choruses)
+const ITEMS = [
+ ['typical', 'این قطعه چقدر شبیه «یک موزیک‌ویدئوی معمولی کی‌پاپ» است؟', 'اصلاً شبیه نیست', 'کاملاً معمولی و آشنا'],
+ ['scheme_perf', 'اجرا و کُرئوگرافی (رقص، چیدمان اعضا، رو به دوربین بودن) چقدر قالبی و آشناست؟', 'کاملاً متفاوت', 'کاملاً قالبی'],
+ ['scheme_edit', 'قاب‌بندی و تدوین (نماها، سرعت برش، حرکت دوربین) چقدر قالبی و آشناست؟', 'کاملاً متفاوت', 'کاملاً قالبی'],
+ ['surface', 'ظاهر قطعه (مفهوم، رنگ، لباس، صحنه) چقدر متمایز و خاص است؟', 'کاملاً معمولی', 'بسیار متمایز'],
+];
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const R = {kind: 'rating', version: 'rate-1.0', started: new Date().toISOString(), rater: '', familiarity: null, order: shuffle(CLIPS), ratings: []};
+function scale(el, key, store, check) {
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { el.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); store[key] = +b.dataset.v; check(); });
+}
+scale($('fam'), 'familiarity', R, () => $('go').disabled = !($('rater').value.trim() && R.familiarity));
+$('rater').oninput = () => $('go').disabled = !($('rater').value.trim() && R.familiarity);
+let i = 0, cur;
+function show() {
+  const c = R.order[i]; cur = {clip: c, plays: 0}; $('hdr').textContent = `قطعه ${i + 1} از ${R.order.length}`;
+  $('v').src = `rate/${c}.mp4`; $('v').onplay = () => cur.plays++; $('note').value = ''; $('next').disabled = true;
+  $('items').innerHTML = ITEMS.map(([k, q, lo, hi]) => `<div class="item"><div>${q}</div><div class="scale" data-k="${k}">${[1,2,3,4,5,6,7].map(v => `<button data-v="${v}">${v}</button>`).join('')}</div><div class="ends"><span>${lo}</span><span>${hi}</span></div></div>`).join('');
+  const check = () => $('next').disabled = !(ITEMS.every(([k]) => k in cur) && cur.plays > 0);
+  $('items').querySelectorAll('.scale').forEach(el => scale(el, el.dataset.k, cur, check)); $('v').addEventListener('play', check);
+}
+$('go').onclick = () => { R.rater = $('rater').value.trim(); $('intro').classList.add('hidden'); $('clipCard').classList.remove('hidden'); show(); };
+$('next').onclick = async () => {
+  cur.note = $('note').value.trim(); R.ratings.push(cur); i++;
+  if (i < R.order.length) { show(); window.scrollTo(0, 0); return; }
+  $('clipCard').classList.add('hidden'); $('done').classList.remove('hidden'); R.finished = new Date().toISOString();
+  let ok = false; try { ok = (await fetch(API + '/save', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(R)})).ok; } catch (e) {}
+  $('doneTxt').textContent = ok ? 'داوری شما ثبت شد.' : 'ارسال ناموفق بود؛ لطفاً به پژوهشگر خبر دهید.';
+};
+</script>
+</body></html>

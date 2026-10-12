@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>پژوهش تماشای موزیک‌ویدئو</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<style>
+:root{--bg:#f3f5f7;--panel:#fff;--text:#16202a;--muted:#55616e;--accent:#0f766e;--line:#d8dfe6;--red:#be123c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Vazirmatn,Tahoma,sans-serif;font-size:17px;line-height:2;font-feature-settings:"ss01"}
+.wrap{max-width:780px;margin:auto;padding:30px 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin-bottom:18px}
+h1{font-size:25px;font-weight:800;margin:0 0 12px;line-height:1.6}h2{font-size:20px;font-weight:700;margin:0 0 10px}
+p,li{margin:6px 0}
+label{display:block;margin:12px 0 4px;font-weight:600}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fbfcfd}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400}.chk input{width:auto;margin-top:9px}
+button{border:0;background:var(--accent);color:#fff;border-radius:11px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}button.sec{background:#e3e8ed;color:var(--text)}
+.muted{color:var(--muted);font-size:15px}.err{color:var(--red);font-weight:600}.hidden{display:none!important}
+.bar{height:9px;background:#e3e8ed;border-radius:9px;overflow:hidden}.bar>div{height:100%;width:0;background:var(--accent);transition:width .2s}
+.likert{display:flex;justify-content:space-between;gap:6px}.likert label{font-weight:400;text-align:center;flex:1;margin:4px 0}
+#card{width:300px;height:189px;border-radius:12px;background:linear-gradient(135deg,#94a3b8,#475569);margin:12px auto;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#bs{position:relative;height:120px;background:#fff;border:1px dashed var(--line);border-radius:10px;margin:10px 0;overflow:hidden}
+#bsSq{position:absolute;width:30px;height:30px;background:#111;top:45px}
+#bsDot{position:absolute;width:30px;height:30px;border-radius:50%;background:#dc2626;top:45px}
+#stage{position:fixed;inset:0;background:#000;z-index:50;display:none;align-items:center;justify-content:center;font-family:Vazirmatn,Tahoma,sans-serif}
+#stim{width:100vw;height:100vh;object-fit:contain;background:#000;display:none}
+#cross{position:absolute;color:#fff;font-size:48px;font-weight:300;display:none;transform:translate(-50%,-50%);left:50%;top:50%;line-height:1}
+#dot{position:absolute;width:20px;height:20px;margin:-10px;border-radius:50%;display:none}
+#gate{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 12%;text-align:center;color:#e2e8f0;font-size:20px;line-height:2}#gate b{color:#fff}
+#stageMsg{position:absolute;top:26px;left:8%;right:8%;text-align:center;color:#e2e8f0;font-size:19px;line-height:1.9}
+#rate{position:absolute;inset:0;background:#0b0f14;color:#e5e7eb;display:none;align-items:center;justify-content:center;overflow:auto}
+#rate .box{background:#151b23;border:1px solid #2b3440;border-radius:16px;padding:24px;max-width:600px;width:94%;font-size:17px}
+#rate .q{margin-top:12px}
+#rate .opts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
+#rate .opts button{background:#263241;color:#e5e7eb;padding:8px 14px;font-weight:600}#rate .opts button.on{background:var(--accent)}
+#rate textarea{background:#0f141b;color:#e5e7eb;border-color:#2b3440;min-height:70px}
+#cam{position:fixed;left:12px;bottom:12px;width:210px;border-radius:10px;transform:scaleX(-1);display:none;z-index:10}
+</style>
+</head>
+<body>
+<div class="wrap" id="page">
+
+<div class="card hidden" id="pMobile">
+<h2>لطفاً با لپ‌تاپ یا رایانه‌ی رومیزی باز کنید</h2>
+<p>این پژوهش با <b>موبایل یا تبلت اجرا نمی‌شود</b>، چون ردیابی نگاه به صفحه‌ی بزرگ و وبکم ثابت نیاز دارد.</p>
+<p>لطفاً همین لینک را روی <b>لپ‌تاپ یا رایانه‌ی رومیزی</b> با مرورگر <b>Chrome یا Edge</b> باز کنید.</p>
+<button id="bCopy" class="sec">کپی لینک</button> <span id="copyTxt" class="muted"></span>
+</div>
+
+<div class="card" id="pConsent">
+<h1>پژوهش «تماشای موزیک‌ویدئوهای کی‌پاپ»</h1>
+<p><b>به فیلترشکن (VPN) نیازی نیست</b>؛ اگر روشن است، لطفاً خاموشش کنید تا ویدئوها سریع‌تر و بی‌وقفه بارگیری شوند.</p>
+<p>این پژوهش بخشی از یک رساله‌ی دکتری رشته‌ی جامعه‌شناسی فرهنگی در حوزه‌ی علوم شناختی و محاسباتی است و بررسی می‌کند بینندگان هنگام تماشای موزیک‌ویدئو به کجای تصویر نگاه می‌کنند. شرکت شما حدود <b>۱۰ دقیقه</b> طول می‌کشد.</p>
+<ul>
+<li>شما <b>۱۲ قطعه‌ی ۲۰ ثانیه‌ای</b> از موزیک‌ویدئوهای کی‌پاپ را با صدا می‌بینید و پس از هر قطعه با چند کلیک به سه پرسش کوتاه پاسخ می‌دهید. در پایان، اگر خواستید، برای هر قطعه یک جمله‌ی کوتاه می‌نویسید.</li>
+<li>جهت نگاه شما با <b>وبکم</b> تخمین زده می‌شود. <b>تصویر دوربین فقط روی همین مرورگر پردازش می‌شود؛ هیچ تصویری از شما ثبت، ذخیره یا ارسال نمی‌شود.</b> فقط مختصات نگاه روی صفحه در طول زمان، به‌صورت عددی، همراه با پاسخ‌های شما و بدون نام، برای تحلیل‌های آماری گردآوری می‌شود و تنها در این پژوهش به کار می‌رود. کد کامل این صفحه و تحلیل‌ها به‌صورت عمومی در این نشانی در دسترس است: <a href="https://github.com/MHAlimardani94/kpop-adorno-eyetracking" target="_blank" rel="noopener" dir="ltr">github.com/MHAlimardani94/kpop-adorno-eyetracking</a></li>
+<li>برخی قطعه‌ها نور و تدوین سریع دارند. اگر سابقه‌ی صرع یا حساسیت به نور چشمک‌زن دارید، لطفاً شرکت نکنید.</li>
+<li>شرکت داوطلبانه است و هر زمان می‌توانید بدون هیچ پیامدی صفحه را ببندید.</li>
+</ul>
+<p class="muted">برای اجرای درست: <b>لپ‌تاپ یا رایانه‌ی رومیزی</b> (نه موبایل)، مرورگر <b>Chrome یا Edge</b>، محیطی روشن (مثل روشنایی معمول اتاق)، و <b>هدفون</b>. </p>
+<p><b>عینک:</b> ردیابی نگاه با عینک طبی دقیق کار نمی‌کند. اگر <b>بدون عینک</b> صفحه‌ی لپ‌تاپ را واضح می‌بینید، لطفاً هنگام آزمایش عینک را بردارید (لنز طبی اشکالی ندارد). اگر بدون عینک صفحه را تار می‌بینید، متأسفانه امکان شرکت ندارید.</p>
+<label class="chk"><input type="checkbox" id="c1"> ۱۸ سال یا بیشتر دارم.</label>
+<label class="chk"><input type="checkbox" id="c2"> توضیحات بالا را خواندم و با شرکت در پژوهش موافقم.</label>
+<div style="margin-top:14px"><button id="bConsent" disabled>ادامه</button></div>
+</div>
+
+<div class="card hidden" id="pInfo">
+<h2>چند پرسش کوتاه</h2>
+<label>سن</label><input id="age" type="number" min="18" max="90">
+<label>جنسیت</label><select id="gender"><option value="">—</option><option>زن</option><option>مرد</option><option>ترجیح می‌دهم نگویم</option></select>
+<label>بینایی</label><select id="vision"><option value="">—</option><option value="normal">بینایی طبیعی دارم</option><option value="weak_clear">چشمم ضعیف است، ولی بدون عینک صفحه را واضح می‌بینم</option><option value="lens">با لنز طبی صفحه را واضح می‌بینم</option><option value="blurry">بدون عینک صفحه را تار و ناواضح می‌بینم</option></select>
+<label>چقدر کی‌پاپ گوش می‌دهید یا تماشا می‌کنید؟</label>
+<select id="kfreq"><option value="">—</option><option value="0">هرگز</option><option value="1">به‌ندرت</option><option value="2">گاهی (چند بار در ماه)</option><option value="3">زیاد (چند بار در هفته)</option><option value="4">تقریباً هر روز</option></select>
+<label>تا چه اندازه خودتان را هوادار کی‌پاپ می‌دانید؟</label>
+<div class="likert">
+<label><input type="radio" name="fan" value="1"><br>اصلاً</label><label><input type="radio" name="fan" value="2"><br>کم</label><label><input type="radio" name="fan" value="3"><br>تا حدی</label><label><input type="radio" name="fan" value="4"><br>زیاد</label><label><input type="radio" name="fan" value="5"><br>کاملاً</label>
+</div>
+<p class="err" id="infoErr"></p>
+<button id="bInfo">ادامه</button>
+</div>
+
+<div class="card hidden" id="pCard">
+<h2>اندازه‌ی صفحه (۳۰ ثانیه)</h2>
+<p>یک کارت بانکی (یا هر کارت هم‌اندازه) را روی صفحه بگذارید و با لغزنده، اندازه‌ی مستطیل خاکستری را دقیقاً هم‌اندازه‌ی کارت کنید.</p>
+<div id="card"></div>
+<input type="range" id="cardR" min="150" max="700" value="300">
+<label class="chk"><input type="checkbox" id="noCard"> کارت بانکی یا کارت هم‌اندازه در دسترسم نیست.</label>
+<button id="bCard">تأیید اندازه</button>
+</div>
+
+<div class="card hidden" id="pBS">
+<h2>فاصله از صفحه (۳۰ ثانیه)</h2>
+<p>در جای همیشگی بنشینید. <b>چشم راست</b> را با پلک ببندید (بدون فشار دادن با دست) تا فقط <b>چشم چپ</b> باز باشد. با چشم چپ <b>فقط به مربع سیاه</b> خیره بمانید و به دایره‌ی قرمز نگاه نکنید.</p>
+<p>دایره‌ی قرمز آرام به سمت چپ حرکت می‌کند. چون به مربع نگاه می‌کنید، دایره را در گوشه‌ی میدان دیدتان (خارج از تمرکز اصلی نگاه) می‌بینید. دایره تا جایی حرکت می‌کند که <b>از میدان دید چشم بازتان ناپدید می‌شود</b> (هر چشم یک «نقطه‌ی کور» طبیعی دارد). <b>همان لحظه که دایره از دیدتان ناپدید شد</b>، کلید فاصله (Space) را بزنید. اگر جا ماندید اشکالی ندارد؛ دایره از اول برمی‌گردد. این کار ۵ بار تکرار می‌شود.</p>
+<div id="bs"><div id="bsSq"></div><div id="bsDot"></div></div>
+<p id="bsTxt" class="muted"></p>
+<button id="bBS">شروع</button>
+<p class="muted">از این‌جا به بعد، فاصله‌ی خود از صفحه را تا پایان تغییر ندهید.</p>
+</div>
+
+<div class="card hidden" id="pSetup">
+<h2>آماده‌سازی</h2>
+<p>۱. هدفون را بگذارید و صدا را تنظیم کنید.</p>
+<button id="bTone" class="sec">پخش صدای آزمایشی</button> <span class="muted">صدا را در سطحی راحت تنظیم کنید و تا پایان تغییر ندهید.</span>
+<p>۲. اجازه‌ی دسترسی به دوربین را بدهید. صورت شما باید کامل و روشن در تصویر کوچک پایین صفحه دیده شود.</p>
+<button id="bCam" class="sec">روشن کردن دوربین</button> <span id="camTxt" class="muted"></span>
+<p>۳. صفحه تمام‌صفحه می‌شود و ابتدا کالیبراسیون انجام می‌شود: به چند نقطه‌ی آبی و بعد سه نقطه‌ی قرمز نگاه می‌کنید (حدود یک دقیقه). <b>سر خود را تا حد ممکن ثابت نگه دارید.</b></p>
+<p>۴. قبل از هر قطعه یک علامت <b>+</b> وسط صفحه می‌آید: به آن نگاه کنید. بعد قطعه را <b>همان‌طور که معمولاً موزیک‌ویدئو تماشا می‌کنید</b> ببینید. بعد از هر قطعه فقط با <b>ماوس</b> به سه پرسش پاسخ دهید و <b>سر خود را جابه‌جا نکنید</b>. نوشتن جمله‌ها برای پایان کار است.</p>
+<p>۵. قطعه‌ها را الگوریتم‌های یادگیری ماشین از میان بیش از ۱۰۰ موزیک‌ویدئوی کره‌ای برگزیده‌اند و <u><b>پژوهشگر در گزینش آن‌ها نقشی نداشته است</b></u>. ممکن است برخی از آن‌ها با شئونات اسلامی منطبق نباشند.</p>
+<p class="err" id="setupErr"></p>
+<p class="muted" id="dlTxt">در حال آماده‌سازی…</p>
+<button id="bStart" disabled>شروع</button>
+</div>
+
+<div class="card hidden" id="pEnd">
+<h2>جمله‌ی هر قطعه</h2>
+<p>ردیابی نگاه تمام شد و حالا می‌توانید راحت بنویسید. برای هر قطعه سه تصویر از آن آمده است. اگر قطعه را به یاد می‌آورید، <b>در یک جمله‌ی کوتاه</b> بنویسید درباره‌ی چه بود یا چه چیزی در آن به چشمتان آمد. نوشتن <b>اختیاری</b> است؛ اگر قطعه‌ای را به یاد نمی‌آورید، آن را خالی بگذارید.</p>
+<div id="sentList"></div>
+<p class="err" id="sentErr"></p>
+<h2>پرسش پایانی (اختیاری)</h2>
+<label>به نظرتان این قطعه‌ها چه چیز مشترکی داشتند، یا چه تفاوتی؟</label>
+<textarea id="open1" rows="3"></textarea>
+<div style="margin-top:12px"><button id="bSend">ارسال و پایان</button></div>
+<p id="sendTxt"></p>
+</div>
+
+<div class="card hidden" id="pThanks"><h2>سپاس از شرکت شما 🌷</h2><p id="thanksTxt"></p></div>
+</div>
+
+<div id="stage"><div id="stageMsg"></div><div id="gate"><div id="gateTxt"></div><button id="gateBtn">ادامه</button></div><video id="stim" playsinline preload="auto"></video><div id="cross">+</div><div id="dot"></div>
+<div id="rate"><div class="box">
+<div class="q">این <b>آهنگ</b> را می‌شناختید؟</div>
+<div class="opts" data-q="fam_song"><button data-v="0">نمی‌شناسم</button><button data-v="1">شنیده‌ام</button><button data-v="2">بارها دیده یا شنیده‌ام</button></div>
+<div class="q">این <b>گروه</b> و اعضایش را می‌شناسید؟</div>
+<div class="opts" data-q="fam_group"><button data-v="0">نمی‌شناسم</button><button data-v="1">کمی</button><button data-v="2">اعضا را خوب می‌شناسم</button></div>
+<div class="q">چقدر از این قطعه خوشتان آمد؟</div>
+<div class="opts" data-q="liking"><button data-v="1">۱ اصلاً</button><button data-v="2">۲</button><button data-v="3">۳</button><button data-v="4">۴</button><button data-v="5">۵ خیلی</button></div>
+<div style="margin-top:16px;text-align:left"><button id="bNext" disabled>ادامه</button></div>
+</div></div>
+</div>
+<video id="cam" autoplay muted playsinline></video>
+
+<script>
+(function () {
+  const ua = navigator.userAgent, ud = navigator.userAgentData;
+  const mob = (ud && ud.mobile) || /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua)
+    || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)              // iPadOS reports a desktop UA
+    || (matchMedia('(pointer:coarse)').matches && !matchMedia('(any-pointer:fine)').matches);
+  window.IS_MOBILE = !!mob;
+  if (mob) {
+    document.getElementById('pConsent').classList.add('hidden');
+    document.getElementById('pMobile').classList.remove('hidden');
+    document.getElementById('bCopy').onclick = () => navigator.clipboard.writeText(location.href.split('?')[0]).then(() => document.getElementById('copyTxt').textContent = '✓ کپی شد');
+  }
+})();
+</script>
+<script type="module">
+import {WebcamETLight,getRecommendedPattern,getCalibrationPointsInPixels} from 'https://esm.sh/@realeye-io/webcam-eyetracker-light-open@1.1.0?bundle';
+
+// ===== settings =====
+const API = 'https://phd-kpop-save.m-h-alimardani94.workers.dev';   // address of the save worker (no trailing slash)
+const CLIPS = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10','C11','C12'];        // clips/C1.mp4 ...; levels are in the private key file only
+const CROSS_MS = 2000, PRED_MS = 33, VERSION = 'kpop-video-et-1.8';
+// Williams-design balanced Latin square for 8 conditions (first-order carry-over balanced)
+const NC = CLIPS.length, WILLIAMS = [0, 1, 11, 2, 10, 3, 9, 4, 8, 5, 7, 6];
+const LATIN = Array.from({length: NC}, (_, r) => WILLIAMS.map(c => (c + r) % NC));
+// symbol -> clip index: indie clips (C9-C12) sit at every third symbol, so each participant gets them spread among the K-pop clips
+const SYM = [0, 1, 8, 2, 3, 9, 4, 5, 10, 6, 7, 11];
+
+const $ = id => document.getElementById(id), sleep = ms => new Promise(r => setTimeout(r, ms));
+const avg = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+const med = a => { if (!a.length) return null; const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const pid = 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const D = {version: VERSION, participant_id: pid, pilot: new URLSearchParams(location.search).has('pilot'), started: new Date().toISOString(), info: {}, env: {}, geometry: {}, calibration: [], validations: [], trials: [], events: [], open: {}, errors: []};
+const blobs = {}; let tracker = null;
+const now = () => Math.round(performance.now());
+const show = (hide, showId) => { $(hide).classList.add('hidden'); $(showId).classList.remove('hidden'); window.scrollTo(0, 0); };
+
+// ===== consent / info =====
+const upd = () => $('bConsent').disabled = !($('c1').checked && $('c2').checked);
+$('c1').onchange = upd; $('c2').onchange = upd;
+$('bConsent').onclick = () => { show('pConsent', 'pInfo'); preload(); };   // clips download in the background during the questions and screen tests
+$('bInfo').onclick = () => {
+  const fan = document.querySelector('input[name=fan]:checked');
+  if (!$('age').value || +$('age').value < 18 || +$('age').value > 90 || !$('gender').value || !$('vision').value || $('kfreq').value === '' || !fan) { $('infoErr').textContent = 'لطفاً همه‌ی موارد را پر کنید.'; return; }
+  if ($('vision').value === 'blurry') { D.screened_out = 'vision'; $('pInfo').classList.add('hidden'); $('pThanks').classList.remove('hidden'); $('thanksTxt').textContent = 'از وقتی که گذاشتید سپاسگزاریم. چون ردیابی نگاه با عینک دقیق کار نمی‌کند و بدون عینک صفحه را واضح نمی‌بینید، این آزمایش برای شما مناسب نیست.'; return; }
+  D.info = {age: +$('age').value, gender: $('gender').value, vision: $('vision').value, kpop_freq: +$('kfreq').value, fan: +fan.value};
+  show('pInfo', 'pCard');
+};
+
+// ===== virtual chinrest (Li et al., 2020): card -> px/mm ; blind spot -> viewing distance =====
+$('cardR').oninput = () => { const w = +$('cardR').value; $('card').style.width = w + 'px'; $('card').style.height = (w * 53.98 / 85.6) + 'px'; };
+$('noCard').onchange = () => { const n = $('noCard').checked; $('cardR').disabled = n; $('card').style.opacity = n ? .3 : 1; };
+$('bCard').onclick = () => {
+  D.geometry.no_card = $('noCard').checked;
+  D.geometry.px_per_mm = D.geometry.no_card ? null : +$('cardR').value / 85.6;   // no card -> no screen-size estimate; analysis uses the fallback
+  show('pCard', 'pBS');
+};
+$('bBS').onclick = async () => {
+  $('bBS').disabled = true;
+  const box = $('bs'), W = box.clientWidth, sqX = W - 60; $('bsSq').style.left = sqX + 'px';
+  const dists = []; D.geometry.bs_keys = D.geometry.bs_keys || []; D.geometry.bs_box_w = W; D.geometry.bs_runs = (D.geometry.bs_runs || 0) + 1;
+  for (let k = 0; k < 5; k++) {
+    let x = sqX - 40, stop = false; $('bsTxt').textContent = `تکرار ${k + 1} از ۵`;
+    const onKey = e => { D.geometry.bs_keys.push(e.code || e.key); if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); stop = true; } };
+    const onClick = () => { D.geometry.bs_keys.push('click'); stop = true; };
+    addEventListener('keydown', onKey); box.addEventListener('pointerdown', onClick);
+    while (!stop && x > 0) { $('bsDot').style.left = x + 'px'; x -= 1.6; await sleep(16); }
+    removeEventListener('keydown', onKey); box.removeEventListener('pointerdown', onClick);
+    if (stop) dists.push((sqX - x) + 15); // centre-to-centre distance in px
+    await sleep(500);
+  }
+  D.geometry.blindspot_px = dists;
+  if (dists.length < 3 && D.geometry.bs_runs < 2) { $('bsTxt').textContent = 'زدن کلید فاصله ثبت نشد. لطفاً دوباره امتحان کنید: همان لحظه که دایره ناپدید شد، کلید فاصله (Space) را بزنید یا روی کادر کلیک کنید.'; $('bBS').textContent = 'تکرار'; $('bBS').disabled = false; return; }
+  if (dists.length >= 3 && D.geometry.px_per_mm) {
+    const pxmm = D.geometry.px_per_mm, dmm = med(dists) / pxmm;
+    D.geometry.view_dist_mm = dmm / Math.tan(13.5 * Math.PI / 180);
+    D.geometry.px_per_deg = pxmm * D.geometry.view_dist_mm * Math.tan(Math.PI / 180);
+  }
+  // plausibility: screen width 250-700 mm and viewing distance 350-1000 mm; otherwise fall back to nominal values
+  const scrW = D.geometry.px_per_mm ? screen.width / D.geometry.px_per_mm : null;
+  D.geometry.card_plausible = !!scrW && scrW >= 250 && scrW <= 700;
+  D.geometry.dist_plausible = !!D.geometry.view_dist_mm && D.geometry.view_dist_mm >= 350 && D.geometry.view_dist_mm <= 1000;
+  if (!D.geometry.card_plausible || !D.geometry.dist_plausible) {
+    const pxmm = D.geometry.card_plausible ? D.geometry.px_per_mm : 96 / 25.4;
+    const dist = D.geometry.dist_plausible ? D.geometry.view_dist_mm : 600;
+    D.geometry.px_per_deg_fallback = pxmm * dist * Math.tan(Math.PI / 180);
+  }
+  D.geometry.blindspot_ok = dists.length >= 3;
+  show('pBS', 'pSetup');
+};
+
+// ===== preload clips as blobs (no buffering during playback) =====
+async function preload() {
+  if (preload.started) return; preload.started = true;
+  const t0 = now();
+  try {
+    for (const c of CLIPS) {
+      for (let k = 1; !blobs[c]; k++) {   // up to 3 attempts per clip
+        try { const r = await fetch(`${c}.mp4`); if (!r.ok) throw new Error(c + ' ' + r.status); blobs[c] = URL.createObjectURL(new Blob([await r.arrayBuffer()], {type: 'video/mp4'})); }
+        catch (e) { D.errors.push('preload ' + k + ': ' + e); if (k >= 3) throw e; await sleep(2000 * k); }
+      }
+    }
+    D.env.preload_ms = now() - t0; $('dlTxt').textContent = '✓ آماده است'; ready();
+  } catch (e) { $('dlTxt').textContent = ''; $('setupErr').textContent = 'آماده‌سازی ناموفق بود. اتصال اینترنت را بررسی و صفحه را دوباره باز کنید.'; D.errors.push(String(e)); }
+}
+$('bTone').onclick = () => { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 440; g.gain.value = .15; o.connect(g).connect(a.destination); o.start(); setTimeout(() => { o.stop(); a.close(); }, 1200); D.env.tone_played = true; };
+let camOK = false;
+function ready() { $('bStart').disabled = !(camOK && Object.keys(blobs).length === CLIPS.length); }
+$('bCam').onclick = async () => {
+  try {
+    const st = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}, height: {ideal: 720}, facingMode: 'user'}, audio: false});
+    $('cam').srcObject = st; await $('cam').play(); $('cam').style.display = 'block';
+    $('camTxt').textContent = 'در حال بارگذاری موتور ردیابی…';
+    for (const dlg of ['GPU', 'CPU']) {
+      try { const t = new WebcamETLight({delegate: dlg, faceDetectorMode: 'landmarker', useLandmarks: true, runningMode: 'VIDEO', minDetectionConfidence: 0.5}); await t.initialize(); tracker = t; D.env.delegate = dlg; break; }
+      catch (e) { D.errors.push('init ' + dlg + ': ' + e); }
+    }
+    if (!tracker) throw new Error('tracker');
+    const s = st.getVideoTracks()[0].getSettings(); D.env.webcam = {w: s.width, h: s.height, fps: s.frameRate};
+    camOK = true; $('camTxt').textContent = '✓ دوربین و موتور ردیابی آماده‌اند'; ready();
+  } catch (e) { $('setupErr').textContent = 'دوربین یا موتور ردیابی راه‌اندازی نشد. اجازه‌ی دوربین را بدهید و از Chrome یا Edge استفاده کنید.'; D.errors.push(String(e)); }
+};
+
+// ===== session events (leaving fullscreen / switching tab invalidates the running trial) =====
+let curTrial = null;
+document.addEventListener('fullscreenchange', () => { const fs = !!document.fullscreenElement; D.events.push({t: now(), ev: fs ? 'fs_on' : 'fs_off'}); if (!fs && curTrial) curTrial.left_fullscreen = true; });
+document.addEventListener('visibilitychange', () => { D.events.push({t: now(), ev: 'vis_' + document.visibilityState}); if (document.hidden && curTrial) curTrial.tab_hidden = true; });
+addEventListener('resize', () => D.events.push({t: now(), ev: 'resize', w: innerWidth, h: innerHeight}));
+
+// ===== stage helpers =====
+function snap() { const v = $('cam'); if (!v.videoWidth) return null; const c = snap.c || (snap.c = document.createElement('canvas')); c.width = v.videoWidth; c.height = v.videoHeight; const x = c.getContext('2d', {willReadFrequently: true}); x.drawImage(v, 0, 0); return x.getImageData(0, 0, c.width, c.height); }
+function predict() { try { const g = tracker.predict($('cam')); return g && Number.isFinite(g.x) && Number.isFinite(g.y) ? g : null; } catch (e) { return null; } }
+function showDot(p, color) { const d = $('dot'); d.style.left = p.x + 'px'; d.style.top = p.y + 'px'; d.style.background = color; d.style.boxShadow = `0 0 0 6px ${color}33,0 0 26px ${color}`; d.style.display = 'block'; }
+const hideDot = () => $('dot').style.display = 'none';
+
+function gate(html, btn = 'ادامه') {
+  return new Promise(res => { hideDot(); $('stageMsg').textContent = ''; $('gateTxt').innerHTML = html; $('gateBtn').textContent = btn; $('gate').style.display = 'flex';
+    $('gateBtn').onclick = () => { $('gate').style.display = 'none'; res(); }; });
+}
+const faDigits = t => String(t).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+// fit the tracker; samples where the face was not found are dropped and the fit repeated (fails if more than 20% are lost)
+function fitTracker(samples) {
+  let used = samples.slice();
+  for (let k = 0; k < 4; k++) {
+    try { tracker.calibrate(used); return {ok: true, dropped: samples.length - used.length}; }
+    catch (e) {
+      const m = faDigits(e.message || e).match(/indices\s*:?\s*([\d,\s]+)/i);
+      if (!m) return {ok: false, err: String(e)};
+      const bad = new Set(m[1].split(/[,\s]+/).filter(Boolean).map(Number)); used = used.filter((_, i) => !bad.has(i));
+      if (used.length < 0.8 * samples.length) return {ok: false, err: 'face lost in too many samples', dropped: samples.length - used.length};
+    }
+  }
+  return {ok: false, err: 'fit failed'};
+}
+async function calibrate(pass) {
+  const pts = getCalibrationPointsInPixels(getRecommendedPattern(), innerWidth, innerHeight), samples = [];
+  for (let i = 0; i < pts.length; i++) {
+    $('stageMsg').textContent = `به نقطه‌ی آبی نگاه کنید (${i + 1} از ${pts.length})`; showDot(pts[i], '#22d3ee'); await sleep(1050);
+    for (let k = 0; k < 5; k++) { const im = snap(); if (im) samples.push({image: im, gazeX: pts[i].x, gazeY: pts[i].y}); await sleep(70); }
+  }
+  hideDot(); $('stageMsg').textContent = 'لحظه‌ای صبر کنید…'; await sleep(50);
+  const fit = fitTracker(samples); D.calibration.push({pass, t: now(), n_samples: samples.length, n_points: pts.length, ...fit}); pts.ok = fit.ok; return pts;
+}
+// quick check: 3 red points at random positions; passes if mean error <= 4 deg (or 200 px without geometry)
+async function check(label) {
+  const W = innerWidth, H = innerHeight, rp = Array.from({length: 3}, () => ({x: Math.round(W * (0.12 + 0.76 * Math.random())), y: Math.round(H * (0.15 + 0.7 * Math.random()))}));
+  const v = await validate(label, rp, '#ef4444', 'حالا به نقطه‌ی قرمز نگاه کنید');
+  const lim = v.mean_err_deg != null ? v.mean_err_deg <= 4 : v.mean_err_px <= 200;
+  v.passed = v.points.length === 3 && lim; return v;
+}
+// calibration loop: instructions -> blue points -> red check; back to blue points with an explanation if it fails (3 tries)
+async function calibrateUntilOK(tag) {
+  for (let a = 1; a <= 3; a++) {
+    const pts = await calibrate(tag + '_' + a);
+    let why = '';
+    if (!pts.ok) why = 'در بخشی از نقطه‌ها صورت شما در تصویر دوربین دیده نشد.';
+    else { const v = await check(tag + '_check_' + a); if (v.passed) return {pts, v}; why = 'نگاه شما هنوز با دقت کافی روی نقطه‌ها تشخیص داده نمی‌شود.'; }
+    if (a < 3) await gate(`<b>کالیبراسیون دقیق نشد.</b><br>${why}<br>لطفاً: صورت را روشن و کامل جلوی دوربین نگه دارید، عینک را بردارید، سر را ثابت نگه دارید و فقط چشم‌ها را به سمت نقطه ببرید.<br>دوباره به نقطه‌های آبی نگاه می‌کنیم.`, 'تکرار کالیبراسیون');
+  }
+  return null;
+}
+async function validate(label, pts, color = '#fbbf24', msg = 'به نقطه‌ی زرد نگاه کنید') {
+  const out = [];
+  for (let i = 0; i < pts.length; i++) {
+    $('stageMsg').textContent = `${msg} (${i + 1} از ${pts.length})`; showDot(pts[i], color); await sleep(800);
+    const g = []; for (let k = 0; k < 6; k++) { const p = predict(); if (p) g.push(p); await sleep(60); }
+    if (g.length) { const gx = med(g.map(p => p.x)), gy = med(g.map(p => p.y)); out.push({tx: pts[i].x, ty: pts[i].y, gx, gy, err: Math.hypot(gx - pts[i].x, gy - pts[i].y), sd: Math.hypot(Math.sqrt(avg(g.map(p => (p.x - gx) ** 2))), Math.sqrt(avg(g.map(p => (p.y - gy) ** 2)))), n: g.length}); }
+  }
+  hideDot();
+  const e = out.map(o => o.err), ppd = D.geometry.px_per_deg || D.geometry.px_per_deg_fallback;   // fallback = nominal geometry (flagged in analysis)
+  const v = {label, t: now(), points: out, mean_err_px: avg(e), median_err_px: med(e), max_err_px: e.length ? Math.max(...e) : null,
+             mean_err_x_px: avg(out.map(o => Math.abs(o.gx - o.tx))), mean_err_y_px: avg(out.map(o => Math.abs(o.gy - o.ty))),
+             offset_x: avg(out.map(o => o.gx - o.tx)), offset_y: avg(out.map(o => o.gy - o.ty)), precision_px: avg(out.map(o => o.sd))};
+  if (ppd) { v.mean_err_deg = v.mean_err_px / ppd; v.precision_deg = v.precision_px / ppd; }
+  D.validations.push(v); return v;
+}
+const pick = (pts, idx) => idx.map(i => pts[i]).filter(Boolean);
+function contentRect(v) { const W = innerWidth, H = innerHeight, ar = v.videoWidth / v.videoHeight; let w = W, h = W / ar; if (h > H) { h = H; w = H * ar; } return {left: (W - w) / 2, top: (H - h) / 2, width: w, height: h}; }
+
+async function trial(clip, i) {
+  const T = {order: i + 1, clip, t_start: now(), cross: [], gaze: [], rating: {}};
+  curTrial = T;
+  // fixation cross: drift check / per-trial offset estimate
+  $('stageMsg').textContent = ''; $('cross').style.display = 'block';
+  const t0 = performance.now();
+  while (performance.now() - t0 < CROSS_MS) { const p = predict(); if (p) T.cross.push({t: Math.round(performance.now() - t0), x: p.x, y: p.y}); await sleep(PRED_MS); }
+  $('cross').style.display = 'none';
+  const late = T.cross.filter(s => s.t >= 800);
+  T.drift = late.length ? {dx: med(late.map(s => s.x)) - innerWidth / 2, dy: med(late.map(s => s.y)) - innerHeight / 2, n: late.length} : null;
+  // video
+  const v = $('stim'); v.src = blobs[clip]; v.currentTime = 0; v.muted = false; v.volume = 1;
+  await new Promise((r, j) => { if (v.readyState >= 3) r(); else { v.oncanplaythrough = () => r(); v.onerror = () => j(new Error('video ' + clip + ' code ' + (v.error && v.error.code))); } });
+  v.style.display = 'block';
+  try { await v.play(); } catch (e) { D.errors.push('play ' + clip + ': ' + e); v.muted = true; await v.play(); T.muted_fallback = true; }
+  const R = contentRect(v); T.rect = R; T.viewport = {w: innerWidth, h: innerHeight}; const tv0 = performance.now();
+  let stalls = 0; v.onwaiting = () => stalls++;
+  // frame log: when each video frame was actually presented (for aligning gaze time with the displayed frame)
+  T.frame_log = [];
+  if (v.requestVideoFrameCallback) { const tok = {}; v._tok = tok; const fcb = (nowT, md) => { if (v._tok !== tok) return; T.frame_log.push({tw: Math.round(md.expectedDisplayTime - tv0), mt: +md.mediaTime.toFixed(3), n: md.presentedFrames}); if (!v.ended && !v.paused) v.requestVideoFrameCallback(fcb); }; v.requestVideoFrameCallback(fcb); }
+  while (!v.ended && !v.paused) {
+    const p = predict(), ct = v.currentTime, tw = Math.round(performance.now() - tv0);
+    if (p) T.gaze.push({tw, vt: +ct.toFixed(3), x: Math.round(p.x), y: Math.round(p.y), nx: +((p.x - R.left) / R.width).toFixed(4), ny: +((p.y - R.top) / R.height).toFixed(4)});
+    else T.gaze.push({tw, vt: +ct.toFixed(3), x: null, y: null});
+    await sleep(Math.max(0, PRED_MS - (performance.now() - tv0 - tw)));
+  }
+  const q = v.getVideoPlaybackQuality?.(); T.frames = q ? {total: q.totalVideoFrames, dropped: q.droppedVideoFrames} : null;
+  T.stalls = stalls; T.duration = v.duration; v.style.display = 'none'; v.removeAttribute('src'); v.load();
+  T.n_samples = T.gaze.length; T.valid_share = T.gaze.length ? T.gaze.filter(g => g.x != null).length / T.gaze.length : 0;
+  T.rate_hz = T.gaze.length / (T.duration || 20);
+  curTrial = null;
+  // post-clip report and ratings
+  await new Promise(res => {
+    const box = $('rate'); box.style.display = 'flex'; $('bNext').disabled = true;
+    const check = () => $('bNext').disabled = !['fam_song', 'fam_group', 'liking'].every(k => k in T.rating);
+    box.querySelectorAll('.opts button').forEach(b => b.classList.remove('on'));
+    box.querySelectorAll('.opts').forEach(o => o.querySelectorAll('button').forEach(b => b.onclick = () => {
+      o.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); T.rating[o.dataset.q] = +b.dataset.v; check();
+    }));
+    $('bNext').onclick = () => { box.style.display = 'none'; res(); };
+  });
+  D.trials.push(T);
+}
+
+function stills(clip, times = [4, 10, 16]) {
+  return new Promise(res => { const v = document.createElement('video'), out = []; let k = 0; v.muted = true; v.src = blobs[clip];
+    v.onloadeddata = () => { v.currentTime = times[0]; };
+    v.onseeked = () => { const c = document.createElement('canvas'); c.width = 240; c.height = Math.round(240 * v.videoHeight / v.videoWidth); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); out.push(c.toDataURL('image/jpeg', .7));
+      if (++k < times.length) v.currentTime = times[k]; else res(out); };
+    v.onerror = () => res(out); });
+}
+async function buildSentences() {
+  const L = $('sentList'); L.innerHTML = '';
+  for (const T of D.trials) {
+    const imgs = await stills(T.clip), d = document.createElement('div'); d.style.margin = '16px 0';
+    d.innerHTML = `<div class="muted">قطعه‌ی ${T.order}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0">` + imgs.map(u => `<img src="${u}" style="width:32%;min-width:150px;border-radius:8px">`).join('') + `</div><textarea data-clip="${T.clip}" rows="2" maxlength="300" placeholder="اختیاری"></textarea>`;
+    L.append(d);
+  }
+}
+async function getRow() {
+  try { const r = await fetch(API + '/row'); if (r.ok) { const j = await r.json(); if (Number.isInteger(j.row)) return {row: (Number.isInteger(j.n) ? j.n : j.row) % NC, source: 'server'}; } } catch (e) {}
+  return {row: Math.floor(Math.random() * NC), source: 'random'};
+}
+
+$('bStart').onclick = async () => {
+  try {
+    const lr = await getRow(); D.latin_row = lr.row; D.latin_source = lr.source; const order = LATIN[lr.row].map(k => CLIPS[SYM[k]]); D.order = order;
+    await document.documentElement.requestFullscreen?.(); await sleep(400);
+    $('page').style.display = 'none'; $('stage').style.display = 'flex'; document.body.style.overflow = 'hidden';
+    D.env = {...D.env, screen_w: screen.width, screen_h: screen.height, inner_w: innerWidth, inner_h: innerHeight, dpr: devicePixelRatio, ua: navigator.userAgent};
+    await gate('<b>کالیبراسیون (حدود یک دقیقه)</b><br>اگر عینک دارید، آن را بردارید. صورت شما باید روشن و کامل جلوی دوربین باشد.<br>در صفحه‌ی بعد <b>نقطه‌های آبی</b> یکی‌یکی در جاهای مختلف صفحه ظاهر می‌شوند: به هر نقطه نگاه کنید تا ناپدید شود.<br><b>سر را ثابت نگه دارید</b> و فقط چشم‌ها را حرکت دهید.<br>پس از آن چند <b>نقطه‌ی قرمز</b> برای آزمون دقت می‌آید؛ به آن‌ها هم نگاه کنید.', 'آماده‌ام');
+    let cal = await calibrateUntilOK('cal');
+    if (!cal) { D.screened_out = 'calibration'; await gate('متأسفانه با این دوربین و نور، ردیابی نگاه به دقت لازم نرسید. از وقتی که گذاشتید بسیار سپاسگزاریم.', 'پایان'); throw new Error('calibration failed 3 times'); }
+    let pts = cal.pts, v1 = cal.v; const vp = pick(pts, [0, 2, 4, 6, 8, 10, 12, 14, 16]);
+    await gate('کالیبراسیون انجام شد ✓<br>حالا قطعه‌ها شروع می‌شوند. قبل از هر قطعه یک علامت <b>+</b> وسط صفحه می‌آید: به آن نگاه کنید. بعد قطعه را همان‌طور که معمولاً موزیک‌ویدئو تماشا می‌کنید ببینید.', 'شروع قطعه‌ها');
+    for (let i = 0; i < order.length; i++) {
+      if (i === NC / 2) {
+        const vm = await validate('mid_session', pick(pts, [0, 4, 8, 12, 16]));
+        if (vm.mean_err_px > Math.max(200, 1.5 * v1.mean_err_px)) {
+          await gate('برای حفظ دقت، یک بار دیگر نقطه‌های آبی و قرمز را دنبال کنید. سر را ثابت نگه دارید.', 'آماده‌ام');
+          const rc = await calibrateUntilOK('recal'); if (rc) { pts = rc.pts; v1 = rc.v; } else D.recal_failed = true;
+          await gate('ادامه‌ی قطعه‌ها.', 'ادامه');
+        }
+      }
+      await trial(order[i], i);
+    }
+    await validate('end_session', vp);
+  } catch (e) { D.errors.push('run: ' + (e && e.stack || e)); if (D.screened_out !== 'calibration') { const m = document.createElement('p'); m.className = 'err'; m.textContent = 'خطای فنی: ' + e + ' (لطفاً این پیام را به پژوهشگر بفرستید)'; $('pEnd').prepend(m); } }
+  document.exitFullscreen?.().catch(() => {}); $('stage').style.display = 'none'; $('page').style.display = 'block'; document.body.style.overflow = '';
+  $('pSetup').classList.add('hidden'); $('pEnd').classList.remove('hidden'); buildSentences();
+  const st = $('cam').srcObject; st && st.getTracks().forEach(t => t.stop()); $('cam').style.display = 'none';
+};
+
+// ===== send (gaze data and contact details are stored separately) =====
+async function post(path, obj) {
+  const body = JSON.stringify(obj);
+  for (let k = 0; k < 3; k++) {
+    try { const r = await fetch(API + path, {method: 'POST', headers: {'content-type': 'application/json'}, body}); if (r.ok) return true; } catch (e) {}
+    await sleep(1500 * (k + 1));
+  }
+  return false;
+}
+$('bSend').onclick = async () => {
+  const tas = [...document.querySelectorAll('#sentList textarea')];
+  tas.forEach(t => { const T = D.trials.find(x => x.clip === t.dataset.clip); if (T && t.value.trim()) T.sentence_end = t.value.trim(); });
+  $('bSend').disabled = true; $('sendTxt').textContent = 'در حال ارسال…';
+  D.open = {text: $('open1').value.trim()}; D.finished = new Date().toISOString();
+  const ok = await post('/save', D);
+  if (ok) { $('pEnd').classList.add('hidden'); $('pThanks').classList.remove('hidden'); $('thanksTxt').textContent = `داده‌های شما با موفقیت ثبت شد. کد شرکت‌کننده: ${pid}`; }
+  else {
+    $('sendTxt').innerHTML = '<span class="err">ارسال ناموفق بود.</span> لطفاً فایل زیر را ذخیره کنید و برای پژوهشگر بفرستید.';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(D)], {type: 'application/json'})); a.download = `kpop_et_${pid}.json`; a.textContent = 'دانلود فایل داده'; a.style.display = 'block'; $('sendTxt').after(a);
+    $('bSend').disabled = false;
+  }
+};
+</script>
+</body>
+</html>
